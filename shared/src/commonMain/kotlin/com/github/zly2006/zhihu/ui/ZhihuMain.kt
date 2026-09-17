@@ -37,7 +37,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateLeftPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -79,6 +79,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -433,7 +434,7 @@ fun ZhihuMain(
     val layoutDirection = LocalLayoutDirection.current
     val shellInsets = ScaffoldDefaults.contentWindowInsets.asPaddingValues()
     val panesStartInWindow = if (twoPane) {
-        shellInsets.calculateLeftPadding(layoutDirection) + NAVIGATION_RAIL_WIDTH_DP.dp
+        shellInsets.calculateStartPadding(layoutDirection) + NAVIGATION_RAIL_WIDTH_DP.dp
     } else {
         0.dp
     }
