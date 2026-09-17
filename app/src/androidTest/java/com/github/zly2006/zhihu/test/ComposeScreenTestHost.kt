@@ -39,6 +39,8 @@ import com.github.zly2006.zhihu.navigation.Navigator
 import com.github.zly2006.zhihu.navigation.TopLevelDestination
 import com.github.zly2006.zhihu.theme.ZhihuTheme
 import com.github.zly2006.zhihu.ui.AndroidZhihuMain
+import com.github.zly2006.zhihu.ui.adaptive.LocalWindowLayoutOverride
+import com.github.zly2006.zhihu.ui.adaptive.WindowLayoutOverride
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -99,6 +101,7 @@ fun MainActivityComposeRule.setScreenContent(
 
 fun MainActivityComposeRule.setZhihuMainContent(
     onNavControllerReady: (NavHostController) -> Unit = {},
+    windowLayout: WindowLayoutOverride? = null,
 ) {
     activity.setContent { }
     waitForIdle()
@@ -109,7 +112,9 @@ fun MainActivityComposeRule.setZhihuMainContent(
                 activity.navController = navController
                 onNavControllerReady(navController)
             }
-            AndroidZhihuMain(navController = navController)
+            CompositionLocalProvider(LocalWindowLayoutOverride provides windowLayout) {
+                AndroidZhihuMain(navController = navController)
+            }
         }
     }
     waitForIdle()

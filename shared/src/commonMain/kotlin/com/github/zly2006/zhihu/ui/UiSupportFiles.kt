@@ -47,6 +47,7 @@ import com.github.zly2006.zhihu.navigation.TopLevelDestination
 import com.github.zly2006.zhihu.platform.SettingsStore
 import com.github.zly2006.zhihu.platform.UserMessageSink
 import com.github.zly2006.zhihu.platform.rememberSettingsStore
+import com.github.zly2006.zhihu.ui.adaptive.LargeScreenLayoutPreference
 import com.github.zly2006.zhihu.ui.subscreens.DUO3_TIQIAN_MARKDOWN_PREFERENCE_KEY
 import com.github.zly2006.zhihu.viewmodel.ArticleViewModel.CachedAnswerContent
 import com.github.zly2006.zhihu.viewmodel.ZhihuApiEnvironment
@@ -307,7 +308,8 @@ enum class TtsState(
 /**
  * 影响应用主壳形态的不可变设置快照。
  *
- * 这些值决定底部栏有哪些入口、主 pager 从哪个页面开始、重选 tab 是否回到顶部/刷新，以及顶栏/底栏是否自动隐藏。
+ * 这些值决定底部栏有哪些入口、主 pager 从哪个页面开始、重选 tab 是否回到顶部/刷新、顶栏/底栏是否自动隐藏，
+ * 以及宽屏是否拆成双栏。
  * [ZhihuMain] 按快照读取它们，避免把更新到一半的导航设置应用到主界面。
  */
 data class ZhihuMainPreferenceSnapshot(
@@ -317,6 +319,7 @@ data class ZhihuMainPreferenceSnapshot(
     val collectionDirectBrowseEnabled: Boolean,
     val selectedBottomBarItemKeys: List<String>,
     val startDestination: TopLevelDestination,
+    val largeScreenLayout: LargeScreenLayoutPreference,
 )
 
 /**
@@ -336,6 +339,7 @@ class ZhihuMainPreferenceState(
     val collectionDirectBrowseEnabled: Boolean get() = snapshot.collectionDirectBrowseEnabled
     val selectedBottomBarItemKeys: List<String> get() = snapshot.selectedBottomBarItemKeys
     val startDestination: TopLevelDestination get() = snapshot.startDestination
+    val largeScreenLayout: LargeScreenLayoutPreference get() = snapshot.largeScreenLayout
 
     fun reload() {
         snapshot = readSnapshot()

@@ -230,6 +230,11 @@ actual fun rememberIsLiteVariant(): Boolean = false
 
 internal actual val platformBottomBarItemLimit: Int? = null
 
+internal actual val isWindowPostureSupported: Boolean = false
+
+@Composable
+actual fun rememberWindowHinge(): WindowHinge? = error("$platformName 不支持折叠姿态检测")
+
 actual val platformName: String = "JVM"
 
 actual val isJvm: Boolean = true

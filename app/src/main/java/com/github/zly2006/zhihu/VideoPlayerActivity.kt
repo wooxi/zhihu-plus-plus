@@ -97,6 +97,7 @@ import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -104,7 +105,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.github.zly2006.zhihu.platform.WindowHinge
+import com.github.zly2006.zhihu.platform.WindowHingeOrientation
 import com.github.zly2006.zhihu.platform.androidSettingsStore
+import com.github.zly2006.zhihu.platform.windowHingeFlow
 import com.github.zly2006.zhihu.util.enableEdgeToEdgeCompat
 import kotlinx.coroutines.delay
 import kotlin.math.abs
@@ -133,6 +137,18 @@ class VideoPlayerActivity : ComponentActivity() {
             val toolbarColor = Color(0xFF1A1A2E).copy(alpha = 0.85f)
             val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
             val isFastForwardingState = remember { mutableStateOf(false) }
+            val density = LocalDensity.current
+            val windowHinge = remember { mutableStateOf<WindowHinge?>(null) }
+            LaunchedEffect(Unit) {
+                windowHingeFlow(this@VideoPlayerActivity).collect { windowHinge.value = it }
+            }
+            // 半开（桌面/悬停）姿态下转轴是横向的：只把播放区域限制在转轴上方，避免画面被铰链切成两半。
+            val tabletopVideoHeight = windowHinge.value
+                ?.takeIf { it.isSeparating && it.orientation == WindowHingeOrientation.Horizontal }
+                ?.boundsInWindowPx
+                ?.top
+                ?.takeIf { it > 0 }
+                ?.let { with(density) { it.toDp() } }
 
             LaunchedEffect(isLandscape) {
                 val ctrl = WindowInsetsControllerCompat(window, window.decorView)
@@ -145,12 +161,20 @@ class VideoPlayerActivity : ComponentActivity() {
             }
 
             Box(Modifier.fillMaxSize().background(Color.Black)) {
-                VideoPlayerView(
-                    videoUrl = videoUrl,
-                    savedPosition = savedPosition,
-                    isFastForwardingState = isFastForwardingState,
-                    onPlayerReady = { p -> player = p },
-                )
+                Box(
+                    modifier = if (tabletopVideoHeight != null) {
+                        Modifier.fillMaxWidth().height(tabletopVideoHeight).align(Alignment.TopCenter)
+                    } else {
+                        Modifier.fillMaxSize()
+                    },
+                ) {
+                    VideoPlayerView(
+                        videoUrl = videoUrl,
+                        savedPosition = savedPosition,
+                        isFastForwardingState = isFastForwardingState,
+                        onPlayerReady = { p -> player = p },
+                    )
+                }
                 if (isLandscape) {
                     LandscapeOverlay(onBack = { finish() })
                 } else {

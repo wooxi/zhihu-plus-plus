@@ -167,3 +167,8 @@ actual val isArticleImageExportSupported: Boolean = false
 actual val isPageTurnSupported: Boolean = false
 
 actual val isAnswerSwipeSupported: Boolean = !nativeIsDesktop
+
+internal actual val isWindowPostureSupported: Boolean = false
+
+@Composable
+actual fun rememberWindowHinge(): WindowHinge? = error("$platformName 不支持折叠姿态检测")

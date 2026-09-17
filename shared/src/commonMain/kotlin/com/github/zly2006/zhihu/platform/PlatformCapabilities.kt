@@ -19,9 +19,36 @@ package com.github.zly2006.zhihu.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntRect
 import kotlinx.io.files.Path
 
 internal expect val platformBottomBarItemLimit: Int?
+
+/** 折叠屏转轴/铰链方向。 */
+enum class WindowHingeOrientation {
+    Vertical,
+    Horizontal,
+}
+
+/**
+ * 平台报告的折叠姿态。
+ *
+ * [boundsInWindowPx] 是铰链在窗口坐标系中的矩形；[isHalfOpened] 表示设备处于半开（悬停/桌面）姿态。
+ * 只有能读到转轴信息的平台才会产生该对象，普通直板设备与桌面窗口读到的都是 null。
+ */
+data class WindowHinge(
+    val isSeparating: Boolean,
+    val orientation: WindowHingeOrientation,
+    val isHalfOpened: Boolean,
+    val boundsInWindowPx: IntRect,
+)
+
+/** 平台是否提供折叠姿态信息；为 false 的平台不得调用 [rememberWindowHinge]。 */
+internal expect val isWindowPostureSupported: Boolean
+
+/** 观察当前窗口的铰链姿态，无铰链时返回 null。 */
+@Composable
+expect fun rememberWindowHinge(): WindowHinge?
 
 expect val platformName: String
 

@@ -105,6 +105,8 @@ import com.github.zly2006.zhihu.theme.ThemeMode
 import com.github.zly2006.zhihu.ui.ANSWER_DOUBLE_TAP_ACTION_PREFERENCE_KEY
 import com.github.zly2006.zhihu.ui.ARTICLE_USE_WEBVIEW_PREFERENCE_KEY
 import com.github.zly2006.zhihu.ui.AnswerDoubleTapAction
+import com.github.zly2006.zhihu.ui.adaptive.LARGE_SCREEN_LAYOUT_PREFERENCE_KEY
+import com.github.zly2006.zhihu.ui.adaptive.LargeScreenLayoutPreference
 import com.github.zly2006.zhihu.ui.components.ANSWER_SWITCH_SENSITIVITY_PREFERENCE_KEY
 import com.github.zly2006.zhihu.ui.components.ColorPickerDialog
 import com.github.zly2006.zhihu.ui.components.DEFAULT_ANSWER_SWITCH_SENSITIVITY
@@ -153,6 +155,7 @@ const val APPEARANCE_SETTINGS_WEBVIEW_OPTIONS_TAG = "appearanceSettings.webViewO
 const val APPEARANCE_SETTINGS_BOTTOM_BAR_SECTION_KEY = "appearanceSettings.bottomBarSection"
 const val APPEARANCE_SETTINGS_COLLECTION_DIRECT_BROWSE_TAG = "appearanceSettings.collectionDirectBrowse"
 const val APPEARANCE_SETTINGS_DISABLE_BOTTOM_SHEET_ROUNDED_CORNERS_TAG = "appearanceSettings.disableBottomSheetRoundedCorners"
+const val APPEARANCE_SETTINGS_LARGE_SCREEN_LAYOUT_TAG = "appearanceSettings.largeScreenLayout"
 
 const val START_DESTINATION_PREFERENCE_KEY = "startDestination"
 const val BOTTOM_BAR_ITEMS_PREFERENCE_KEY = "bottom_bar_items"
@@ -1321,6 +1324,76 @@ fun AppearanceSettingsScreen(
                     onCheckedChange = {
                         autoHideBottomBar.value = it
                         settings.putBoolean("autoHideBottomBar", it)
+                    },
+                )
+            }
+
+            // ── 大屏与折叠屏 ────────────────────────────────────────────────
+            var largeScreenLayoutExpanded by remember { mutableStateOf(false) }
+            val largeScreenLayout = remember {
+                mutableStateOf(
+                    LargeScreenLayoutPreference.fromPreference(
+                        settings.getStringOrNull(LARGE_SCREEN_LAYOUT_PREFERENCE_KEY),
+                    ),
+                )
+            }
+            SettingItemGroup(
+                title = "大屏与折叠屏",
+                header = {
+                    Text(
+                        "展开内屏、平板和桌面窗口按宽度自动切换形态：窄屏用底部导航，宽屏改用左侧导航，再宽时列表与详情并排。",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                },
+            ) {
+                SettingItem(
+                    modifier = Modifier.testTag(APPEARANCE_SETTINGS_LARGE_SCREEN_LAYOUT_TAG),
+                    title = { Text("大屏内容布局") },
+                    description = {
+                        Text(
+                            when (largeScreenLayout.value) {
+                                LargeScreenLayoutPreference.Auto -> "宽度足够时列表与详情并排显示，选中左侧内容后直接在右侧打开。"
+                                LargeScreenLayoutPreference.SingleColumn -> "始终只显示一栏，宽屏下仍使用左侧导航。"
+                            },
+                        )
+                    },
+                    settingKey = LARGE_SCREEN_LAYOUT_PREFERENCE_KEY,
+                    highlightedKey = settingKey,
+                    bringIntoViewRequester = requesterFor(LARGE_SCREEN_LAYOUT_PREFERENCE_KEY),
+                    endAction = {
+                        ExposedDropdownMenuBox(
+                            expanded = largeScreenLayoutExpanded,
+                            onExpandedChange = { largeScreenLayoutExpanded = it },
+                        ) {
+                            OutlinedTextField(
+                                value = largeScreenLayout.value.label,
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = largeScreenLayoutExpanded) },
+                                modifier = Modifier
+                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                    .width(160.dp),
+                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            )
+                            ExposedDropdownMenu(
+                                expanded = largeScreenLayoutExpanded,
+                                onDismissRequest = { largeScreenLayoutExpanded = false },
+                            ) {
+                                LargeScreenLayoutPreference.entries.forEach { mode ->
+                                    DropdownMenuItem(
+                                        text = { Text(mode.label) },
+                                        onClick = {
+                                            largeScreenLayout.value = mode
+                                            settings.putString(LARGE_SCREEN_LAYOUT_PREFERENCE_KEY, mode.preferenceValue)
+                                            largeScreenLayoutExpanded = false
+                                            userMessages.showShortMessage("已设置为：${mode.label}")
+                                        },
+                                    )
+                                }
+                            }
+                        }
                     },
                 )
             }

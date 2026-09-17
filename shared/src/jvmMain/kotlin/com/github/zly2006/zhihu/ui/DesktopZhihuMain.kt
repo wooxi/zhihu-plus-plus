@@ -60,6 +60,8 @@ import com.github.zly2006.zhihu.platform.platformBottomBarItemLimit
 import com.github.zly2006.zhihu.platform.rememberSettingsStore
 import com.github.zly2006.zhihu.platform.rememberUserMessageSink
 import com.github.zly2006.zhihu.theme.ThemeManager
+import com.github.zly2006.zhihu.ui.adaptive.LARGE_SCREEN_LAYOUT_PREFERENCE_KEY
+import com.github.zly2006.zhihu.ui.adaptive.LargeScreenLayoutPreference
 import com.github.zly2006.zhihu.ui.subscreens.BOTTOM_BAR_ITEMS_PREFERENCE_KEY
 import com.github.zly2006.zhihu.ui.subscreens.BOTTOM_BAR_ITEM_ORDER_PREFERENCE_KEY
 import com.github.zly2006.zhihu.ui.subscreens.COLLECTION_DIRECT_BROWSE_PREFERENCE_KEY
@@ -274,6 +276,9 @@ private fun rememberDesktopZhihuMainPreferenceState(): ZhihuMainPreferenceState 
                     settings.getString(START_DESTINATION_PREFERENCE_KEY, Home.name),
                     orderedSelectedKeys.ifEmpty { allBottomBarItemKeys.filter { it in selectedKeys } },
                 ),
+            ),
+            largeScreenLayout = LargeScreenLayoutPreference.fromPreference(
+                settings.getStringOrNull(LARGE_SCREEN_LAYOUT_PREFERENCE_KEY),
             ),
         )
     }

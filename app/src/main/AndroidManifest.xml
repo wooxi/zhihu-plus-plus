@@ -88,7 +88,7 @@
                 android:name=".VideoPlayerActivity"
                 android:exported="false"
                 android:theme="@style/Theme.Zhihu"
-                android:configChanges="orientation|screenSize"/>
+                android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"/>
         <activity
                 android:name=".QRCodeScanActivity"
                 android:exported="false"
