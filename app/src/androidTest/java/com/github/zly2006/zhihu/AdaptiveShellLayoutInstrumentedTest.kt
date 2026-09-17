@@ -93,7 +93,13 @@ class AdaptiveShellLayoutInstrumentedTest {
         composeRule.onNodeWithTag("main_detail_pane").assertExists()
         composeRule.onNodeWithTag("main_detail_placeholder").assertExists()
         val listPaneBounds = composeRule.onNodeWithTag("main_list_pane").getBoundsInRoot()
-        assertEquals(DEFAULT_LIST_PANE_WIDTH_DP, listPaneBounds.width.value, paneWidthToleranceDp)
+        val displayMetrics = composeRule.activity.resources.displayMetrics
+        val railNode = composeRule.onNodeWithTag("main_navigation_rail")
+        val railBounds = railNode.getBoundsInRoot()
+        // 模拟器窗口通常比注入的逻辑宽度窄，列表栏会被父约束夹紧，所以按“请求宽度与可用宽度取小”断言。
+        val windowWidthDp = displayMetrics.widthPixels / displayMetrics.density
+        val expectedListWidth = minOf(DEFAULT_LIST_PANE_WIDTH_DP, windowWidthDp - railBounds.width.value)
+        assertEquals(expectedListWidth, listPaneBounds.width.value, paneWidthToleranceDp)
     }
 
     @Test
