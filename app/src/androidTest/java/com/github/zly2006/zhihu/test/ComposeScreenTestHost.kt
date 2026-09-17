@@ -100,8 +100,8 @@ fun MainActivityComposeRule.setScreenContent(
 }
 
 fun MainActivityComposeRule.setZhihuMainContent(
-    onNavControllerReady: (NavHostController) -> Unit = {},
     windowLayout: WindowLayoutOverride? = null,
+    onNavControllerReady: (NavHostController) -> Unit = {},
 ) {
     activity.setContent { }
     waitForIdle()
